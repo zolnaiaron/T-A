@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timivel mit fogunk csinálni?</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ecdcb9; --ink:#a23c08; --muted:#8a5427; --line:#d6bf94; --accent:#dc5a0a;
+  --serif:"Nunito",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --sans:"Nunito",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 1rem/1.55 var(--sans); -webkit-font-smoothing:antialiased;
+}
+main{max-width:40rem; margin:0 auto; padding:clamp(3rem,10vw,6rem) 1.5rem 5rem}
+
+
+/* countdown: the one big moment */
+.countdown{margin:0}
+.cd{display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(.5rem,2.5vw,1rem)}
+.cd > div{
+  background:rgba(162,60,8,.07); border-radius:1.1rem; text-align:center;
+  padding:clamp(1rem,4.5vw,1.75rem) .25rem clamp(.8rem,3.5vw,1.25rem);
+}
+.n{
+  display:block; font:800 clamp(2.4rem,12vw,4.5rem)/1 var(--serif);
+  letter-spacing:0; font-variant-numeric:tabular-nums lining-nums; color:var(--accent);
+}
+.l{display:block; margin-top:.5rem; font:600 clamp(.7rem,2.8vw,.9rem)/1.2 var(--sans); color:var(--muted)}
+.done{font:800 clamp(2.2rem,9vw,3.4rem)/1.1 var(--serif); color:var(--accent); margin:0}
+[hidden]{display:none !important}
+
+/* days */
+.day{margin-top:clamp(3rem,9vw,4.5rem)}
+.day h2{
+  display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap;
+  font:800 1.8rem/1.1 var(--serif); margin:0; color:var(--accent);
+}
+.day h2 .date{font:600 .95rem/1 var(--sans); color:var(--muted)}
+.now{display:none; font:800 .8rem/1 var(--sans); background:var(--ink); color:var(--bg); border-radius:99px; padding:.3rem .65rem}
+.today .now{display:inline-block}
+
+ul{list-style:none; margin:1.1rem 0 0; padding:0}
+li{
+  display:grid; grid-template-columns:7.2rem 1fr; gap:1rem;
+  padding:.85rem 0; border-top:1px solid var(--line);
+}
+li:last-child{border-bottom:1px solid var(--line)}
+.t{font-weight:800; font-size:.92rem; font-variant-numeric:tabular-nums; padding-top:.08rem}
+.soft .t{font-weight:600; color:var(--muted)}
+.sub{display:block; color:var(--muted); font-size:.88rem; margin-top:.1rem}
+
+@media (max-width:420px){
+  li{grid-template-columns:6.1rem 1fr; gap:.75rem}
+  .t{font-size:.82rem}
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="countdown" aria-label="Visszaszámláló a találkozásig">
+    <div id="cd" class="cd" role="timer">
+      <div><span class="n" id="d">00</span><span class="l">nap</span></div>
+      <div><span class="n" id="h">00</span><span class="l">óra</span></div>
+      <div><span class="n" id="m">00</span><span class="l">perc</span></div>
+      <div><span class="n" id="s">00</span><span class="l">másodperc</span></div>
+    </div>
+    <p id="done" class="done" hidden>Találkoztunk!</p>
+  </section>
+
+  <section class="day" data-date="2026-10-29">
+    <h2>Csütörtök <span class="date">okt. 29.</span><span class="now">ma</span></h2>
+    <ul>
+      <li><span class="t">10:15–13:25</span><span>Nagyvárad → Budapest Népliget<span class="sub">FlixBus</span></span></li>
+      <li><span class="t">13:45</span><span>Elmegyünk pisilni és valami pogácsát/ennivalót venni</span></li>
+      <li><span class="t">14:30–15:30</span><span>Budapest Újpest Városkapu → Őrbottyán<span class="sub">busz</span></span></li>
+      <li><span class="t">16:00–17:00</span><span>Főzünk<span class="sub">Mézesmustáros csirkemell, jázmínrizs és valami zöldség</span></span></li>
+      <li><span class="t">17:30</span><span>Vacsébédelünk</span></li>
+      <li><span class="t">18:00–20:30</span><span>Lock in<span class="sub">tanulás</span></span></li>
+      <li class="soft"><span class="t">Utána</span><span>Csinálhatunk bármit…</span></li>
+    </ul>
+  </section>
+
+  <section class="day" data-date="2026-10-30">
+    <h2>Péntek <span class="date">okt. 30.</span><span class="now">ma</span></h2>
+    <ul>
+      <li><span class="t">5:30</span><span>Kelés</span></li>
+      <li><span class="t">6:08</span><span>Őrbottyán → Budapest<span class="sub">busz</span></span></li>
+      <li><span class="t">8:00–9:45</span><span>BSZ1 ZH<span class="sub">Te leülhetsz egy asztalhoz, ahol nyugodtan ehetsz/tanulhatsz</span></span></li>
+      <li class="soft"><span class="t">Közben</span><span>Elmegyünk a boltba, ahol veszünk dolgokat a randira</span></li>
+      <li><span class="t">10:45–11:30</span><span>Budapest → Őrbottyán<span class="sub">busz</span></span></li>
+      <li><span class="t">13:00</span><span>Ebédelünk egyet</span></li>
+      <li><span class="t">16:00</span><span>Elmegyünk randizni</span></li>
+    </ul>
+  </section>
+
+  <section class="day" data-date="2026-10-31">
+    <h2>Szombat <span class="date">okt. 31.</span><span class="now">ma</span></h2>
+    <ul>
+      <li class="soft"><span class="t">Valamikor</span><span>Gokartozni megyünk<span class="sub">délelőtt vagy délután, ezt még nem tudni</span></span></li>
+      <li><span class="t">18:30</span><span>Ifi</span></li>
+      <li class="soft"><span class="t">Utána</span><span>Elmehetünk Vácra a Dunapartra sétálni</span></li>
+    </ul>
+  </section>
+
+  <section class="day" data-date="2026-11-01">
+    <h2>Vasárnap <span class="date">nov. 1.</span><span class="now">ma</span></h2>
+    <ul>
+      <li><span class="t">9:30</span><span>Imaház</span></li>
+      <li><span class="t">14:00–15:00</span><span>Őrbottyán → Budapest Nyugati<span class="sub">vonat</span></span></li>
+      <li><span class="t">15:19–18:26</span><span>Budapest Nyugati → Debrecen<span class="sub">vonat</span></span></li>
+      <li><span class="t">19:05–19:45</span><span>Debrecen → Nyírábrány<span class="sub">vonat</span></span></li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function(){
+  // 2026. október 29. 13:25, magyar idő (CET, UTC+1) – mindenhol ugyanarra a pillanatra számol
+  var T = new Date("2026-10-29T13:25:00+01:00").getTime();
+  var d = document.getElementById("d"), h = document.getElementById("h"),
+      m = document.getElementById("m"), s = document.getElementById("s");
+  function p(n){ return n < 10 ? "0" + n : "" + n; }
+  function tick(){
+    var ms = T - Date.now();
+    if (ms <= 0){
+      document.getElementById("cd").hidden = true;
+      document.getElementById("done").hidden = false;
+      return false;
+    }
+    var t = Math.floor(ms / 1000);
+    d.textContent = p(Math.floor(t / 86400));
+    h.textContent = p(Math.floor(t % 86400 / 3600));
+    m.textContent = p(Math.floor(t % 3600 / 60));
+    s.textContent = p(t % 60);
+    return true;
+  }
+  if (tick()){
+    var id = setInterval(function(){ if (!tick()) clearInterval(id); }, 1000);
+  }
+  try {
+    var today = new Intl.DateTimeFormat("en-CA", {timeZone: "Europe/Budapest"}).format(new Date());
+    var days = document.querySelectorAll(".day");
+    for (var i = 0; i < days.length; i++){
+      if (days[i].getAttribute("data-date") === today) days[i].classList.add("today");
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
