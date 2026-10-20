@@ -167,5 +167,27 @@ li:last-child{border-bottom:1px solid var(--line)}
   } catch (e) {}
 })();
 </script>
+<script>
+(function(){
+  function checkBlackWindow(){
+    var url = new URL(window.location.href);
+    url.searchParams.set("_black_window_check", Date.now());
+    fetch(url.toString(), {cache: "no-store"})
+      .then(function(response){
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.text();
+      })
+      .then(function(html){
+        var match = html.match(/var\s+Black_window\s*=\s*(true|false)\s*;/);
+        if (!match) throw new Error("Black_window setting not found");
+        document.documentElement.hidden = match[1] === "true";
+      })
+      .catch(function(error){
+        console.warn("Black_window frissítése nem sikerült:", error);
+      });
+  }
+  setInterval(checkBlackWindow, 15000);
+})();
+</script>
 </body>
 </html>
