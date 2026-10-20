@@ -1,0 +1,16 @@
+{
+  "name": "T & A",
+  "short_name": "T&A",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ecdcb9",
+  "theme_color": "#ecdcb9",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
