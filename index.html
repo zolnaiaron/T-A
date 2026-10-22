@@ -29,8 +29,15 @@ document.documentElement.hidden = Black_window;
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
 body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font:400 1rem/1.55 var(--sans); -webkit-font-smoothing:antialiased;
+  margin:0;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at top left, rgba(220,90,10,.12) 0%, transparent 55%),
+    linear-gradient(135deg, #f4e8d1 0%, #e1cc9e 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font:400 1rem/1.55 var(--sans);
+  -webkit-font-smoothing:antialiased;
 }
 main{max-width:40rem; margin:0 auto; padding:clamp(3rem,10vw,6rem) 1.5rem 5rem}
 
@@ -110,7 +117,7 @@ li:last-child{border-bottom:1px solid var(--line)}
       <li class="soft"><span class="t">Közben</span><span>Elmegyünk a boltba, ahol veszünk dolgokat a randira</span></li>
       <li><span class="t">10:45–11:30</span><span>Budapest → Őrbottyán<span class="sub">busz</span></span></li>
       <li><span class="t">13:00</span><span>Ebédelünk egyet</span></li>
-      <li><span class="t">16:00</span><span>Elmegyünk randizni</span></li>
+      <li><span class="t">14:00</span><span>Elmegyünk randizni</span></li>
     </ul>
   </section>
 
