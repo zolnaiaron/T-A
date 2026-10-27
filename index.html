@@ -81,6 +81,65 @@ li:last-child{border-bottom:1px solid var(--line)}
   li{grid-template-columns:6.1rem 1fr; gap:.75rem}
   .t{font-size:.82rem}
 }
+
+/* felugró csomagolós lista */
+.pop{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:
+    max(1rem,env(safe-area-inset-top,0px))
+    max(1rem,env(safe-area-inset-right,0px))
+    max(1rem,env(safe-area-inset-bottom,0px))
+    max(1rem,env(safe-area-inset-left,0px));
+  background:rgba(236,220,185,.72);
+  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+}
+.sheet{
+  position:relative; width:100%; max-width:30rem; max-height:100%;
+  display:flex; flex-direction:column;
+  background:linear-gradient(135deg,#f6ebd6 0%,#ebd9b0 100%);
+  border:1px solid var(--line); border-radius:1.4rem;
+  box-shadow:0 1.5rem 3rem -1.25rem rgba(162,60,8,.45);
+  animation:pop-in .22s ease-out;
+}
+.sheet-body{
+  overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  padding:1.4rem 1.25rem 1.5rem;
+}
+.pop-close{
+  position:absolute; top:.7rem; right:.7rem; z-index:1;
+  display:grid; place-items:center; width:2.5rem; height:2.5rem; padding:0;
+  border:0; border-radius:50%; cursor:pointer;
+  background:rgba(162,60,8,.1); color:var(--ink);
+}
+.pop-close svg{width:1.1rem; height:1.1rem}
+
+/* vékony görgetősáv */
+.sheet-body::-webkit-scrollbar{width:3px}
+.sheet-body::-webkit-scrollbar-track{background:transparent; margin:1rem 0}
+.sheet-body::-webkit-scrollbar-thumb{background:rgba(162,60,8,.35); border-radius:99px}
+@supports not selector(::-webkit-scrollbar){
+  .sheet-body{scrollbar-width:thin; scrollbar-color:rgba(162,60,8,.35) transparent}
+}
+.pop-close:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.pt{font:800 1.5rem/1.15 var(--serif); color:var(--accent); margin:0; padding-right:2.9rem}
+.pt + ul{margin-top:.9rem}
+ul + .pt{margin-top:1.9rem; padding-right:0}
+.pop li{grid-template-columns:1.5rem 1fr; gap:.4rem; padding:.7rem 0}
+.mk::before{
+  content:""; display:block; width:.55rem; height:.55rem;
+  margin:.45rem 0 0 .2rem; border-radius:50%; background:var(--accent);
+}
+.no .mk::before{
+  content:"×"; width:auto; height:auto; margin:0; background:none;
+  font:800 1.2rem/1.3 var(--sans); color:var(--muted);
+}
+
+@keyframes pop-in{
+  from{opacity:0; transform:translateY(.6rem) scale(.98)}
+  to{opacity:1; transform:none}
+}
+@media (prefers-reduced-motion:reduce){ .sheet{animation:none} }
 </style>
 </head>
 <body>
@@ -141,6 +200,37 @@ li:last-child{border-bottom:1px solid var(--line)}
   </section>
 </main>
 
+<!-- Felugró lista: minden megnyitáskor megjelenik, 2026. nov. 29. 10:00 (magyar idő) után soha többé -->
+<div id="pop" class="pop" role="dialog" aria-modal="true" aria-labelledby="popTitle" hidden>
+  <div class="sheet">
+    <button id="popClose" class="pop-close" type="button" aria-label="Bezárás">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+    <div class="sheet-body">
+      <h2 id="popTitle" class="pt">Mit hozzál magaddal?</h2>
+      <ul>
+        <li><span class="mk" aria-hidden="true"></span><span>Fogkefe</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Egy szép ruhát a randira</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Imaházra csak normális</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Telefontöltő</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Fejhallgató</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Esetleg tablet vagy füzetek a tanuláshoz</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Alsónemű és zokni</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Alvóruha, pizsama</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Váltóruha a következő napra</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Pénztárca, személyi igazolvány</span></li>
+      </ul>
+      <h2 class="pt">Mit ne hozzál magaddal?</h2>
+      <ul class="no">
+        <li><span class="mk" aria-hidden="true"></span><span>Törölköző</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Fogkrém</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Sampon, tusfürdő</span></li>
+        <li><span class="mk" aria-hidden="true"></span><span>Dezodor</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   // 2026. október 29. 13:25, magyar idő (CET, UTC+1) – mindenhol ugyanarra a pillanatra számol
@@ -172,6 +262,34 @@ li:last-child{border-bottom:1px solid var(--line)}
       if (days[i].getAttribute("data-date") === today) days[i].classList.add("today");
     }
   } catch (e) {}
+})();
+</script>
+<script>
+(function(){
+  // Eddig mutatjuk a listát: 2026. november 29. 10:00, magyar idő (CET, UTC+1). Ezután soha többé.
+  var END = new Date("2026-11-29T10:00:00+01:00").getTime();
+  var pop = document.getElementById("pop");
+  var closeBtn = document.getElementById("popClose");
+  if (!pop || !closeBtn) return;
+
+  function onKey(e){ if (e.key === "Escape") close(); }
+  function close(){
+    pop.hidden = true;
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", onKey);
+  }
+  function open(){
+    if (Date.now() >= END) return;
+    pop.hidden = false;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    closeBtn.focus({preventScroll: true});
+  }
+
+  closeBtn.addEventListener("click", close);
+  open();
+  // ha a böngésző a gyorsítótárból hozza vissza az oldalt (vissza gomb), akkor is újra felugrik
+  window.addEventListener("pageshow", function(e){ if (e.persisted) open(); });
 })();
 </script>
 <script>
