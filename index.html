@@ -62,11 +62,14 @@ main{max-width:40rem; margin:0 auto; padding:clamp(3rem,10vw,6rem) 1.5rem 5rem}
 .day h2 .date{font:600 .95rem/1 var(--sans); color:var(--muted)}
 .now{display:none; font:800 .8rem/1 var(--sans); background:var(--ink); color:var(--bg); border-radius:99px; padding:.3rem .65rem}
 .today .now{display:inline-block}
+.day.over h2{opacity:.5}
 
 ul{list-style:none; margin:1.1rem 0 0; padding:0}
 li{
   display:grid; grid-template-columns:7.2rem 1fr; gap:1rem;
   padding:.85rem 0; border-top:1px solid var(--line);
+  scroll-margin-top:1.25rem;
+  transition:background-color .4s, opacity .4s;
 }
 li:last-child{border-bottom:1px solid var(--line)}
 .t{font-weight:800; font-size:.92rem; font-variant-numeric:tabular-nums; padding-top:.08rem}
@@ -74,9 +77,51 @@ li:last-child{border-bottom:1px solid var(--line)}
 .sub{display:block; color:var(--muted); font-size:.88rem; margin-top:.1rem}
 .day a{color:inherit; text-decoration:none}
 
+/* események állapota: múlt / most / következő */
+li.past{opacity:.45}
+li.current{
+  background:rgba(220,90,10,.12);
+  box-shadow:inset 0 0 0 1.5px rgba(220,90,10,.4);
+  border-radius:1rem; border-top-color:transparent;
+  margin:0 -.85rem; padding-left:.85rem; padding-right:.85rem;
+}
+li.current + li{border-top-color:transparent}
+li.current .t{color:var(--accent)}
+li.current a{font-weight:800}
+li.current .t::after,
+li.next .t::after{
+  display:block; width:max-content; margin-top:.45rem;
+  font:800 .74rem/1 var(--sans); padding:.32rem .65rem; border-radius:99px;
+}
+li.current .t::after{
+  content:"Most"; background:var(--ink); color:var(--bg);
+  animation:pulse 2.2s ease-out infinite;
+}
+li.next .t::after{content:"Következő"; color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(162,60,8,.45)}
+  70%,100%{box-shadow:0 0 0 .65rem rgba(162,60,8,0)}
+}
+
+/* visszaugrás a mostani eseményre, ha elgörgettél */
+.jump{
+  position:fixed; left:50%; bottom:calc(1rem + env(safe-area-inset-bottom,0px));
+  transform:translate(-50%,1rem); opacity:0; visibility:hidden;
+  transition:opacity .25s, transform .25s, visibility 0s .25s;
+  border:0; border-radius:99px; background:var(--ink); color:var(--bg);
+  font:800 .95rem/1 var(--sans); padding:.85rem 1.2rem; cursor:pointer;
+  box-shadow:0 6px 20px rgba(162,60,8,.3);
+}
+.jump.show{opacity:1; visibility:visible; transform:translate(-50%,0); transition-delay:0s}
+.jump:focus-visible{outline:3px solid var(--accent); outline-offset:3px}
+
 @media (max-width:420px){
   li{grid-template-columns:6.1rem 1fr; gap:.75rem}
   .t{font-size:.82rem}
+}
+@media (prefers-reduced-motion:reduce){
+  li.current .t::after{animation:none}
+  .jump,li{transition:none}
 }
 
 </style>
@@ -93,52 +138,60 @@ li:last-child{border-bottom:1px solid var(--line)}
     <p id="done" class="done" hidden>Találkoztunk!</p>
   </section>
 
+  <!--
+    Időpontok: data-s = kezdés, data-e = vége (elhagyható: ilyenkor a következő esemény kezdéséig tart).
+    Formátum: "ÉÉÉÉ-HH-NN óó:pp" + opcionálisan időzóna. Alapértelmezett: magyar idő (+01:00).
+    A romániai (EET) időpontok kifejezetten +02:00-val vannak megadva.
+  -->
+
   <section class="day" data-date="2026-10-29">
     <h2>Csütörtök <span class="date">okt. 29.</span><span class="now">ma</span></h2>
     <ul>
-      <li><span class="t">8:00–9:20</span><span><a href="https://www.cento.ro/rezultat?plecare=106&amp;sosire=98&amp;zi=29.10.2026">8:00 Autogara Cento Trans Marghita → 9:20 Autogara Intrans SA</a><span class="sub">busz (Cento)</span></span></li>
-      <li><span class="t">10:15–13:25</span><span><a href="FlixBus%20jegy%20Oktober%2029..pdf">Nagyvárad → Budapest Népliget</a><span class="sub">FlixBus</span></span></li>
-      <li><span class="t">13:45</span><span>Elmegyünk pisilni és valami pogácsát/ennivalót venni</span></li>
-      <li><span class="t">14:30–15:30</span><span>Budapest Újpest Városkapu → Őrbottyán<span class="sub">busz</span></span></li>
-      <li><span class="t">16:00–17:00</span><span>Főzünk<span class="sub">Mézesmustáros csirkemell, jázmínrizs és valami zöldség</span></span></li>
-      <li><span class="t">17:30</span><span>Vacsebédelünk</span></li>
-      <li><span class="t">18:00–20:30</span><span>Lock in<span class="sub">tanulás</span></span></li>
-      <li class="soft"><span class="t">Utána</span><span>Csinálhatunk bármit…</span></li>
+      <li data-s="2026-10-29 08:00 +02:00" data-e="2026-10-29 09:20 +02:00"><span class="t">8:00–9:20</span><span><a href="https://www.cento.ro/rezultat?plecare=106&amp;sosire=98&amp;zi=29.10.2026">8:00 Autogara Cento Trans Marghita → 9:20 Autogara Intrans SA</a><span class="sub">busz (Cento)</span></span></li>
+      <li data-s="2026-10-29 10:15 +02:00" data-e="2026-10-29 13:25"><span class="t">10:15–13:25</span><span><a href="FlixBus%20jegy%20Oktober%2029..pdf">Nagyvárad → Budapest Népliget</a><span class="sub">FlixBus</span></span></li>
+      <li data-s="2026-10-29 13:45"><span class="t">13:45</span><span>Elmegyünk pisilni és valami pogácsát/ennivalót venni</span></li>
+      <li data-s="2026-10-29 14:30" data-e="2026-10-29 15:30"><span class="t">14:30–15:30</span><span>Budapest Újpest Városkapu → Őrbottyán<span class="sub">busz</span></span></li>
+      <li data-s="2026-10-29 16:00" data-e="2026-10-29 17:00"><span class="t">16:00–17:00</span><span>Főzünk<span class="sub">Mézesmustáros csirkemell, jázmínrizs és valami zöldség</span></span></li>
+      <li data-s="2026-10-29 17:30"><span class="t">17:30</span><span>Vacsebédelünk</span></li>
+      <li data-s="2026-10-29 18:00" data-e="2026-10-29 20:30"><span class="t">18:00–20:30</span><span>Lock in<span class="sub">tanulás</span></span></li>
+      <li class="soft" data-s="2026-10-29 20:30"><span class="t">Utána</span><span>Csinálhatunk bármit…</span></li>
     </ul>
   </section>
 
   <section class="day" data-date="2026-10-30">
     <h2>Péntek <span class="date">okt. 30.</span><span class="now">ma</span></h2>
     <ul>
-      <li><span class="t">5:30</span><span>Kelés</span></li>
-      <li><span class="t">6:08</span><span>Őrbottyán → Budapest<span class="sub">busz</span></span></li>
-      <li><span class="t">8:00–9:45</span><span>BSZ1 ZH<span class="sub">Te leülhetsz egy asztalhoz, ahol nyugodtan ehetsz/tanulhatsz</span></span></li>
-      <li class="soft"><span class="t">Közben</span><span>Elmegyünk a boltba, ahol veszünk dolgokat a randira</span></li>
-      <li><span class="t">10:45–11:30</span><span>Budapest → Őrbottyán<span class="sub">busz</span></span></li>
-      <li><span class="t">13:00</span><span>Ebédelünk egyet</span></li>
-      <li><span class="t">15:00</span><span>Elmegyünk randizni</span></li>
+      <li data-s="2026-10-30 05:30"><span class="t">5:30</span><span>Kelés</span></li>
+      <li data-s="2026-10-30 06:08"><span class="t">6:08</span><span>Őrbottyán → Budapest<span class="sub">busz</span></span></li>
+      <li data-s="2026-10-30 08:00" data-e="2026-10-30 09:45"><span class="t">8:00–9:45</span><span>BSZ1 ZH<span class="sub">Te leülhetsz egy asztalhoz, ahol nyugodtan ehetsz/tanulhatsz</span></span></li>
+      <li class="soft" data-s="2026-10-30 09:45"><span class="t">Közben</span><span>Elmegyünk a boltba, ahol veszünk dolgokat a randira</span></li>
+      <li data-s="2026-10-30 10:45" data-e="2026-10-30 11:30"><span class="t">10:45–11:30</span><span>Budapest → Őrbottyán<span class="sub">busz</span></span></li>
+      <li data-s="2026-10-30 13:00"><span class="t">13:00</span><span>Ebédelünk egyet</span></li>
+      <li data-s="2026-10-30 15:00"><span class="t">15:00</span><span>Elmegyünk randizni</span></li>
     </ul>
   </section>
 
   <section class="day" data-date="2026-10-31">
     <h2>Szombat <span class="date">okt. 31.</span><span class="now">ma</span></h2>
     <ul>
-      <li class="soft"><span class="t">Délelőtt</span><span>Gokartozni megyünk<span class="sub"></span></span></li>
-      <li><span class="t">18:30</span><span>Ifi</span></li>
-      <li class="soft"><span class="t">Utána</span><span>Elmehetünk Vácra a Dunapartra sétálni</span></li>
+      <li class="soft" data-s="2026-10-31 09:00" data-e="2026-10-31 12:00"><span class="t">Délelőtt</span><span>Gokartozni megyünk<span class="sub"></span></span></li>
+      <li data-s="2026-10-31 18:30"><span class="t">18:30</span><span>Ifi</span></li>
+      <li class="soft" data-s="2026-10-31 20:30"><span class="t">Utána</span><span>Elmehetünk Vácra a Dunapartra sétálni</span></li>
     </ul>
   </section>
 
   <section class="day" data-date="2026-11-01">
     <h2>Vasárnap <span class="date">nov. 1.</span><span class="now">ma</span></h2>
     <ul>
-      <li><span class="t">9:30</span><span>Imaház</span></li>
-      <li><span class="t">12:00–13:00</span><span>Őrbottyán → Budapest<span class="sub">vonat</span></span></li>
-      <li><span class="t">13:19–16:32</span><span>Budapest → Debrecen<span class="sub">vonat</span></span></li>
-      <li><span class="t">17:10–17:55</span><span>Debrecen → Nyírábrány<span class="sub">vonat</span></span></li>
+      <li data-s="2026-11-01 09:30"><span class="t">9:30</span><span>Imaház</span></li>
+      <li data-s="2026-11-01 12:00" data-e="2026-11-01 13:00"><span class="t">12:00–13:00</span><span>Őrbottyán → Budapest<span class="sub">vonat</span></span></li>
+      <li data-s="2026-11-01 13:19" data-e="2026-11-01 16:32"><span class="t">13:19–16:32</span><span>Budapest → Debrecen<span class="sub">vonat</span></span></li>
+      <li data-s="2026-11-01 17:10" data-e="2026-11-01 17:55"><span class="t">17:10–17:55</span><span>Debrecen → Nyírábrány<span class="sub">vonat</span></span></li>
     </ul>
   </section>
 </main>
+
+<button class="jump" id="jump" type="button" aria-label="Ugrás a mostani eseményhez">↑ Most</button>
 
 <script>
 (function(){
@@ -174,6 +227,99 @@ li:last-child{border-bottom:1px solid var(--line)}
 })();
 </script>
 <script>
+// Mostani esemény kiemelése + belépéskor odagörgetés
+(function(){
+  var items = Array.prototype.slice.call(document.querySelectorAll(".day li[data-s]"));
+  var jump = document.getElementById("jump");
+  if (!items.length || !jump) return;
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try { history.scrollRestoration = "manual"; } catch (e) {}
+
+  // "2026-10-29 08:00" vagy "2026-10-29 08:00 +02:00" → ms (alapértelmezett időzóna: +01:00)
+  function parse(str){
+    var m = /^(\d{4}-\d\d-\d\d)[ T](\d\d:\d\d)\s*([+-]\d\d:\d\d)?$/.exec((str || "").trim());
+    return m ? new Date(m[1] + "T" + m[2] + ":00" + (m[3] || "+01:00")).getTime() : NaN;
+  }
+
+  var ev = items.map(function(li){
+    return {li: li, s: parse(li.getAttribute("data-s")), e: parse(li.getAttribute("data-e"))};
+  });
+  // ha nincs megadva a vége: a következő esemény kezdéséig tart (az utolsónál 1 óra)
+  ev.forEach(function(x, i){
+    if (isNaN(x.e)) x.e = i + 1 < ev.length ? ev[i + 1].s : x.s + 3600000;
+  });
+
+  var focus = null;     // az az <li>, amihez görgetünk
+  var touched = false;  // görgetett/nyúlt-e már az oldalhoz a felhasználó
+
+  // Állapotok frissítése. Igazat ad vissza, ha a fókuszált esemény megváltozott.
+  function update(){
+    var now = Date.now(), cur = null, next = null;
+    ev.forEach(function(x){
+      if (x.s <= now && now < x.e) cur = x;
+      else if (x.s > now && (!next || x.s < next.s)) next = x;
+    });
+    ev.forEach(function(x){
+      var isCur = x === cur;
+      x.li.classList.toggle("current", isCur);
+      x.li.classList.toggle("next", !cur && x === next);
+      x.li.classList.toggle("past", !isCur && x.e <= now);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".day"), function(day){
+      day.classList.toggle("over", !day.querySelector("li:not(.past)"));
+    });
+    // fókusz: épp zajló → következő → (minden véget ért) az utolsó → (még nem kezdődött) semmi
+    var last = ev[ev.length - 1];
+    var f = cur || next || (now >= last.e ? last : null);
+    var el = f ? f.li : null;
+    var changed = el !== focus;
+    focus = el;
+    return changed;
+  }
+
+  function go(smooth){
+    if (focus) focus.scrollIntoView({block: "start", behavior: smooth && !reduce ? "smooth" : "auto"});
+    else window.scrollTo(0, 0);
+  }
+
+  // "↑ Most" / "↓ Most" gomb, ha a mostani esemény kicsúszott a képből
+  var raf = 0;
+  function sync(){
+    raf = 0;
+    if (!focus){ jump.classList.remove("show"); return; }
+    var r = focus.getBoundingClientRect();
+    var visible = r.bottom > 0 && r.top < window.innerHeight;
+    jump.classList.toggle("show", !visible);
+    if (!visible) jump.textContent = r.bottom <= 0 ? "↑ Most" : "↓ Most";
+  }
+  function queue(){ if (!raf) raf = requestAnimationFrame(sync); }
+
+  function enter(){ touched = false; update(); go(false); sync(); }
+  window.__scrollToNow = enter; // a Black_window ellenőrző hívja, amikor az oldal újra látható
+
+  ["wheel", "touchstart", "keydown", "mousedown"].forEach(function(t){
+    addEventListener(t, function(){ touched = true; }, {passive: true});
+  });
+  addEventListener("scroll", queue, {passive: true});
+  addEventListener("resize", queue);
+  jump.addEventListener("click", function(){ touched = false; go(true); });
+
+  // belépéskor / visszatéréskor (alkalmazásváltás, bfcache) mindig a mostani eseményre ugrik
+  enter();
+  function reanchor(){ if (!touched){ go(false); sync(); } } // betűtípus/kép miatti elmozdulás ellen
+  addEventListener("load", reanchor);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reanchor);
+  addEventListener("pageshow", function(e){ if (e.persisted) enter(); });
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden) enter(); });
+
+  // megnyitva hagyott oldalon is léptet: ha váltott az esemény, és nem nyúltak hozzá, szépen odagörget
+  setInterval(function(){
+    if (update() && !touched) go(true);
+    sync();
+  }, 15000);
+})();
+</script>
+<script>
 (function(){
   function checkBlackWindow(){
     var url = new URL(window.location.href);
@@ -186,7 +332,10 @@ li:last-child{border-bottom:1px solid var(--line)}
       .then(function(html){
         var match = html.match(/var\s+Black_window\s*=\s*(true|false)\s*;/);
         if (!match) throw new Error("Black_window setting not found");
+        var wasHidden = document.documentElement.hidden;
         document.documentElement.hidden = match[1] === "true";
+        // amikor az oldal újra láthatóvá válik, görgessen a mostani eseményhez
+        if (wasHidden && !document.documentElement.hidden && window.__scrollToNow) window.__scrollToNow();
       })
       .catch(function(error){
         console.warn("Black_window frissítése nem sikerült:", error);
