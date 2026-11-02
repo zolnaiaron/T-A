@@ -3,345 +3,201 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-var Black_window = false;
-document.documentElement.hidden = Black_window;
-</script>
-<title>T&amp;A</title>
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ecdcb9">
-<meta name="apple-mobile-web-app-title" content="T&A">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Terv</title>
 <style>
-:root{
-  --bg:#f4e8d1; --ink:#a23c08; --muted:#8a5427; --line:#d6bf94; --accent:#dc5a0a;
-  --serif:"Nunito",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
-  --sans:"Nunito",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
-  color-scheme:light;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*,*::before,*::after{box-sizing:inherit}
-body{
-  margin:0;
-  background-color:var(--bg);
-  color:var(--ink);
-  font:400 1rem/1.55 var(--sans);
-  -webkit-font-smoothing:antialiased;
-}
-main{max-width:40rem; margin:0 auto; padding:clamp(3rem,10vw,6rem) 1.5rem 5rem}
-
-
-/* countdown: the one big moment */
-.countdown{margin:0}
-.cd{display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(.5rem,2.5vw,1rem)}
-.cd > div{
-  background:rgba(162,60,8,.07); border-radius:1.1rem; text-align:center;
-  padding:clamp(1rem,4.5vw,1.75rem) .25rem clamp(.8rem,3.5vw,1.25rem);
-}
-.n{
-  display:block; font:800 clamp(2.4rem,12vw,4.5rem)/1 var(--serif);
-  letter-spacing:0; font-variant-numeric:tabular-nums lining-nums; color:var(--accent);
-}
-.l{display:block; margin-top:.5rem; font:600 clamp(.7rem,2.8vw,.9rem)/1.2 var(--sans); color:var(--muted)}
-.done{font:800 clamp(2.2rem,9vw,3.4rem)/1.1 var(--serif); color:var(--accent); margin:0}
+:root{--ink:#000;--paper:#fff;--grey:#6b6b6b}
+*{box-sizing:border-box}
 [hidden]{display:none !important}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:36rem;margin:0 auto;padding:clamp(2.5rem,10vh,5rem) 1.25rem 4rem}
+a{color:inherit}
 
-/* days */
-.day{margin-top:clamp(3rem,9vw,4.5rem)}
-.day h2{
-  display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap;
-  font:800 1.8rem/1.1 var(--serif); margin:0; color:var(--accent);
+/* idővonal: a vonal csak az események között fut, az utolsónál megáll */
+.timeline{list-style:none;margin:0;padding:0 0 0 26px}
+.timeline li{position:relative;padding:0 0 2.2rem}
+.timeline li:last-child{padding-bottom:0}
+.timeline li::before{
+  content:"";position:absolute;left:-30px;top:6px;
+  box-sizing:border-box;width:10px;height:10px;border:1px solid var(--ink);border-radius:50%;background:var(--paper);z-index:1;
 }
-.day h2 .date{font:600 .95rem/1 var(--sans); color:var(--muted)}
-.now{display:none; font:800 .8rem/1 var(--sans); background:var(--ink); color:var(--bg); border-radius:99px; padding:.3rem .65rem}
-.today .now{display:inline-block}
-.day.over h2{opacity:.5}
-
-ul{list-style:none; margin:1.1rem 0 0; padding:0}
-li{
-  display:grid; grid-template-columns:7.2rem 1fr; gap:1rem;
-  padding:.85rem 0; border-top:1px solid var(--line);
-  scroll-margin-top:1.25rem;
-  transition:background-color .4s, opacity .4s;
+.timeline li:not(:last-child)::after{
+  content:"";position:absolute;left:-26px;top:6px;bottom:0;
+  width:2px;background:var(--ink);
 }
-li:last-child{border-bottom:1px solid var(--line)}
-.t{font-weight:800; font-size:.92rem; font-variant-numeric:tabular-nums; padding-top:.08rem}
-.soft .t{font-weight:600; color:var(--muted)}
-.sub{display:block; color:var(--muted); font-size:.88rem; margin-top:.1rem}
-.day a{color:inherit; text-decoration:none}
-
-/* események állapota: múlt / most / következő */
-li.past{opacity:.45}
-li.current{
-  background:rgba(220,90,10,.12);
-  box-shadow:inset 0 0 0 1.5px rgba(220,90,10,.4);
-  border-radius:1rem; border-top-color:transparent;
-  margin:0 -.85rem; padding-left:.85rem; padding-right:.85rem;
-}
-li.current + li{border-top-color:transparent}
-li.current .t{color:var(--accent)}
-li.current a{font-weight:800}
-li.current .t::after,
-li.next .t::after{
-  display:block; width:max-content; margin-top:.45rem;
-  font:800 .74rem/1 var(--sans); padding:.32rem .65rem; border-radius:99px;
-}
-li.current .t::after{
-  content:"Most"; background:var(--ink); color:var(--bg);
-  animation:pulse 2.2s ease-out infinite;
-}
-li.next .t::after{content:"Következő"; color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+.timeline li.current::before{background:var(--ink);animation:pulse 2.8s ease-in-out infinite}
 @keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(162,60,8,.45)}
-  70%,100%{box-shadow:0 0 0 .65rem rgba(162,60,8,0)}
+  0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.25)}
+  50%{box-shadow:0 0 0 6px rgba(0,0,0,0)}
 }
+.when{display:block;font-size:.85rem;color:var(--grey);margin-bottom:.15rem}
+.what{font-size:1.1rem;font-weight:600}
+li.current .what{text-decoration:underline;text-underline-offset:4px}
+a.what{text-decoration:underline;text-underline-offset:4px}
 
-/* visszaugrás a mostani eseményre, ha elgörgettél */
-.jump{
-  position:fixed; left:50%; bottom:calc(1rem + env(safe-area-inset-bottom,0px));
-  transform:translate(-50%,1rem); opacity:0; visibility:hidden;
-  transition:opacity .25s, transform .25s, visibility 0s .25s;
-  border:0; border-radius:99px; background:var(--ink); color:var(--bg);
-  font:800 .95rem/1 var(--sans); padding:.85rem 1.2rem; cursor:pointer;
-  box-shadow:0 6px 20px rgba(162,60,8,.3);
-}
-.jump.show{opacity:1; visibility:visible; transform:translate(-50%,0); transition-delay:0s}
-.jump:focus-visible{outline:3px solid var(--accent); outline-offset:3px}
-
-@media (max-width:420px){
-  li{grid-template-columns:6.1rem 1fr; gap:.75rem}
-  .t{font-size:.82rem}
-}
-@media (prefers-reduced-motion:reduce){
-  li.current .t::after{animation:none}
-  .jump,li{transition:none}
-}
-
+/* esküvő oldal (csak a timeline-ról érhető el) */
+#eskuvo h1{font-size:1.8rem;margin:0 0 2rem;font-weight:700}
+#eskuvo h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--grey);margin:2.6rem 0 .9rem;font-weight:600}
+#eskuvo h3{font-size:1rem;margin:0 0 .5rem;font-weight:600}
+#eskuvo p{margin:0 0 .4rem;line-height:1.55}
+#eskuvo ul{list-style:none;margin:0;padding:0}
+#eskuvo li{padding:.35rem 0;border-bottom:1px solid #e6e6e6}
+table{width:100%;border-collapse:collapse}
+td{padding:.5rem 0;border-bottom:1px solid #e6e6e6;vertical-align:top}
+td.amt{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.total td{font-weight:700;border-bottom:1px solid var(--ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.back{display:inline-block;margin-bottom:2rem;font-size:.9rem;color:var(--grey);text-decoration:none}
+.back:hover{color:var(--ink)}
+@media (max-width:480px){.cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
-  <section class="countdown" aria-label="Visszaszámláló a találkozásig">
-    <div id="cd" class="cd" role="timer">
-      <div><span class="n" id="d">00</span><span class="l">nap</span></div>
-      <div><span class="n" id="h">00</span><span class="l">óra</span></div>
-      <div><span class="n" id="m">00</span><span class="l">perc</span></div>
-      <div><span class="n" id="s">00</span><span class="l">másodperc</span></div>
+
+  <!-- FŐOLDAL -->
+  <div id="home">
+    <ol class="timeline" id="timeline"></ol>
+  </div>
+
+  <!-- ESKÜVŐSZERVEZÉS (csak a timeline eseményéről nyitható: #eskuvo) -->
+  <section id="eskuvo" hidden>
+    <a class="back" href="#">← Vissza</a>
+    <h1>Esküvőszervezés</h1>
+
+    <h2>Általános információk</h2>
+    <p>Időpont: 2028 nyarán (július vége / augusztus eleje)</p>
+
+    <h2>Költségvetés</h2>
+    <table>
+      <tr><td>Helyszín (inkább kinti)</td><td class="amt">150 000 Ft</td></tr>
+      <tr><td>Menyasszonyi ruha (gloriamenyasszonyiruha.hu)</td><td class="amt">150 000 Ft</td></tr>
+      <tr><td>Polgári esküvő</td><td class="amt">15 000 Ft</td></tr>
+      <tr><td>Vacsora / étkezés (saját készítés)</td><td class="amt">300 000 Ft</td></tr>
+      <tr><td>Torta (felkérés alapján)</td><td class="amt">50 000 Ft</td></tr>
+      <tr><td>Üdítő, szörp</td><td class="amt">50 000 Ft</td></tr>
+      <tr><td>Gyűrű (fehér arany, eljegyzésihez hasonló)</td><td class="amt">300 000 Ft</td></tr>
+      <tr><td>Meghívók</td><td class="amt">15 000 Ft</td></tr>
+      <tr class="total"><td>Összesen</td><td class="amt">1 030 000 Ft</td></tr>
+    </table>
+
+    <h2>Meghívottak</h2>
+    <div class="cols">
+      <div>
+        <h3>Áron vendégei</h3>
+        <ul>
+          <li>Joel</li><li>Marijn</li><li>Lídia</li><li>Johanna</li><li>Balázs</li>
+          <li>Panni</li><li>Léna</li><li>Dániel</li><li>Virág</li><li>Rézi</li>
+        </ul>
+      </div>
+      <div>
+        <h3>MamaTimi vendégei</h3>
+        <ul>
+          <li>Napsi</li><li>Sámuel</li><li>Sanyi</li><li>Anya</li><li>Evódia</li>
+          <li>Gergő</li><li>Bianka</li><li>Jónathán</li><li>Bianka és Jónathán gyereke</li>
+          <li>Napsi + 1</li>
+        </ul>
+      </div>
     </div>
-    <p id="done" class="done" hidden>Találkoztunk!</p>
-  </section>
 
-  <!--
-    Időpontok: data-s = kezdés, data-e = vége (elhagyható: ilyenkor a következő esemény kezdéséig tart).
-    Formátum: "ÉÉÉÉ-HH-NN óó:pp" + opcionálisan időzóna. Alapértelmezett: magyar idő (+01:00).
-    A romániai (EET) időpontok kifejezetten +02:00-val vannak megadva.
-  -->
-
-  <section class="day" data-date="2026-10-29">
-    <h2>Csütörtök <span class="date">okt. 29.</span><span class="now">ma</span></h2>
+    <h2>Közreműködők</h2>
     <ul>
-      <li data-s="2026-10-29 08:00 +02:00" data-e="2026-10-29 09:20 +02:00"><span class="t">8:00–9:20</span><span><a href="https://www.cento.ro/rezultat?plecare=106&amp;sosire=98&amp;zi=29.10.2026">8:00 Autogara Cento Trans Marghita → 9:20 Autogara Intrans SA</a><span class="sub">busz (Cento)</span></span></li>
-      <li data-s="2026-10-29 10:15 +02:00" data-e="2026-10-29 13:25"><span class="t">10:15–13:25</span><span><a href="FlixBus%20jegy%20Oktober%2029..pdf">Nagyvárad → Budapest Népliget</a><span class="sub">FlixBus</span></span></li>
-      <li data-s="2026-10-29 13:45"><span class="t">13:45</span><span>Elmegyünk pisilni és valami pogácsát/ennivalót venni</span></li>
-      <li data-s="2026-10-29 14:30" data-e="2026-10-29 15:30"><span class="t">14:30–15:30</span><span>Budapest Újpest Városkapu → Őrbottyán<span class="sub">busz</span></span></li>
-      <li data-s="2026-10-29 16:00" data-e="2026-10-29 17:00"><span class="t">16:00–17:00</span><span>Főzünk<span class="sub">Mézesmustáros csirkemell, jázmínrizs és valami zöldség</span></span></li>
-      <li data-s="2026-10-29 17:30"><span class="t">17:30</span><span>Vacsebédelünk</span></li>
-      <li data-s="2026-10-29 18:00" data-e="2026-10-29 20:30"><span class="t">18:00–20:30</span><span>Lock in<span class="sub">tanulás</span></span></li>
-      <li class="soft" data-s="2026-10-29 20:30"><span class="t">Utána</span><span>Csinálhatunk bármit…</span></li>
+      <li>Vendég lelkipásztor</li>
+      <li>Vendég fotós</li>
     </ul>
+
+    <h2>Menü</h2>
+    <ul>
+      <li>Húsleves</li>
+      <li>Töltött káposzta</li>
+      <li>Sütemények</li>
+      <li>Hidegtál (saláta, köret, hús)</li>
+    </ul>
+
+    <h2>Esküvő menetrendje</h2>
+    <table>
+      <tr><td>10:00 – 10:30</td><td>Polgári esküvő, utána szeretetvendégség</td></tr>
+      <tr><td>12:00 – 13:00</td><td>Templomi esküvő, utána személyes köszöntések</td></tr>
+      <tr><td>14:00 – 17:00</td><td>Vacsora / ebéd a szűk családdal</td></tr>
+      <tr><td>18:00-tól</td><td>Rendezvény vége</td></tr>
+    </table>
+
+    <h2>Nászút</h2>
+    <p>Időtartam: 2,5 hét</p>
+    <p>Tervezett keret: 1 500 000 Ft</p>
+    <p>Úti cél: valamelyik északi ország (Norvégia, Finnország vagy Svédország)</p>
   </section>
 
-  <section class="day" data-date="2026-10-30">
-    <h2>Péntek <span class="date">okt. 30.</span><span class="now">ma</span></h2>
-    <ul>
-      <li data-s="2026-10-30 05:30"><span class="t">5:30</span><span>Kelés</span></li>
-      <li data-s="2026-10-30 06:08"><span class="t">6:08</span><span>Őrbottyán → Budapest<span class="sub">busz</span></span></li>
-      <li data-s="2026-10-30 08:00" data-e="2026-10-30 09:45"><span class="t">8:00–9:45</span><span>BSZ1 ZH<span class="sub">Te leülhetsz egy asztalhoz, ahol nyugodtan ehetsz/tanulhatsz</span></span></li>
-      <li class="soft" data-s="2026-10-30 09:45"><span class="t">Közben</span><span>Elmegyünk a boltba, ahol veszünk dolgokat a randira</span></li>
-      <li data-s="2026-10-30 10:45" data-e="2026-10-30 11:30"><span class="t">10:45–11:30</span><span>Budapest → Őrbottyán<span class="sub">busz</span></span></li>
-      <li data-s="2026-10-30 13:00"><span class="t">13:00</span><span>Ebédelünk egyet</span></li>
-      <li data-s="2026-10-30 15:00"><span class="t">15:00</span><span>Elmegyünk randizni</span></li>
-    </ul>
-  </section>
-
-  <section class="day" data-date="2026-10-31">
-    <h2>Szombat <span class="date">okt. 31.</span><span class="now">ma</span></h2>
-    <ul>
-      <li class="soft" data-s="2026-10-31 09:00" data-e="2026-10-31 12:00"><span class="t">Délelőtt</span><span>Gokartozni megyünk<span class="sub"></span></span></li>
-      <li data-s="2026-10-31 18:30"><span class="t">18:30</span><span>Ifi</span></li>
-      <li class="soft" data-s="2026-10-31 20:30"><span class="t">Utána</span><span>Elmehetünk Vácra a Dunapartra sétálni</span></li>
-    </ul>
-  </section>
-
-  <section class="day" data-date="2026-11-01">
-    <h2>Vasárnap <span class="date">nov. 1.</span><span class="now">ma</span></h2>
-    <ul>
-      <li data-s="2026-11-01 09:30"><span class="t">9:30</span><span>Imaház</span></li>
-      <li data-s="2026-11-01 12:00" data-e="2026-11-01 13:00"><span class="t">12:00–13:00</span><span>Őrbottyán → Budapest<span class="sub">vonat</span></span></li>
-      <li data-s="2026-11-01 13:19" data-e="2026-11-01 16:32"><span class="t">13:19–16:32</span><span>Budapest → Debrecen<span class="sub">vonat</span></span></li>
-      <li data-s="2026-11-01 17:10" data-e="2026-11-01 17:55"><span class="t">17:10–17:55</span><span>Debrecen → Nyírábrány<span class="sub">vonat</span></span></li>
-    </ul>
-  </section>
 </main>
 
-<button class="jump" id="jump" type="button" aria-label="Ugrás a mostani eseményhez">↑ Most</button>
-
 <script>
-(function(){
-  // 2026. október 29. 13:25, magyar idő (CET, UTC+1) – mindenhol ugyanarra a pillanatra számol
-  var T = new Date("2026-10-29T13:25:00+01:00").getTime();
-  var d = document.getElementById("d"), h = document.getElementById("h"),
-      m = document.getElementById("m"), s = document.getElementById("s");
-  function p(n){ return n < 10 ? "0" + n : "" + n; }
-  function tick(){
-    var ms = T - Date.now();
-    if (ms <= 0){
-      document.getElementById("cd").hidden = true;
-      document.getElementById("done").hidden = false;
-      return false;
-    }
-    var t = Math.floor(ms / 1000);
-    d.textContent = p(Math.floor(t / 86400));
-    h.textContent = p(Math.floor(t % 86400 / 3600));
-    m.textContent = p(Math.floor(t % 3600 / 60));
-    s.textContent = p(t % 60);
-    return true;
-  }
-  if (tick()){
-    var id = setInterval(function(){ if (!tick()) clearInterval(id); }, 1000);
-  }
-  try {
-    var today = new Intl.DateTimeFormat("en-CA", {timeZone: "Europe/Budapest"}).format(new Date());
-    var days = document.querySelectorAll(".day");
-    for (var i = 0; i < days.length; i++){
-      if (days[i].getAttribute("data-date") === today) days[i].classList.add("today");
-    }
-  } catch (e) {}
-})();
-</script>
-<script>
-// Mostani esemény kiemelése + belépéskor odagörgetés
-(function(){
-  var items = Array.prototype.slice.call(document.querySelectorAll(".day li[data-s]"));
-  var jump = document.getElementById("jump");
-  if (!items.length || !jump) return;
-  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  try { history.scrollRestoration = "manual"; } catch (e) {}
+(function () {
+  var home = document.getElementById("home");
+  var wedding = document.getElementById("eskuvo");
+  var list = document.getElementById("timeline");
 
-  // "2026-10-29 08:00" vagy "2026-10-29 08:00 +02:00" → ms (alapértelmezett időzóna: +01:00)
-  function parse(str){
-    var m = /^(\d{4}-\d\d-\d\d)[ T](\d\d:\d\d)\s*([+-]\d\d:\d\d)?$/.exec((str || "").trim());
-    return m ? new Date(m[1] + "T" + m[2] + ":00" + (m[3] || "+01:00")).getTime() : NaN;
+  // Események: [év, hónap (0-tól)]; az esemény a "to" hónap végéig látszik
+  var events = [
+    { when: "2027 július",                             what: "Érettségi Timi",  from: [2027, 6], to: [2027, 6] },
+    { when: "2027 augusztus",                          what: "Eljegyzés",       from: [2027, 7], to: [2027, 7] },
+    { when: "2027 augusztus vége – szeptember eleje",  what: "Költözés",        from: [2027, 7], to: [2027, 8] },
+    { when: "2027 szeptember",                         what: "Munkakeresés",    from: [2027, 8], to: [2027, 8] },
+    { when: "2027 október",                            what: "Munka",           from: [2027, 9], to: [2027, 9] },
+    { when: "2027 október – 2028 június",              what: "Esküvőszervezés", from: [2027, 9], to: [2028, 5], wedding: true },
+    { when: "2028 július – augusztus",                 what: "Esküvő",          from: [2028, 6], to: [2028, 7] }
+  ];
+
+  function startOf(ym) { return new Date(ym[0], ym[1], 1); }
+  function endOf(ym)   { return new Date(ym[0], ym[1] + 1, 0, 23, 59, 59); }
+
+  function addItem(when, what, isCurrent, href) {
+    var li = document.createElement("li");
+    if (isCurrent) li.className = "current";
+
+    var w = document.createElement("span");
+    w.className = "when";
+    w.textContent = when;
+
+    var t = document.createElement(href ? "a" : "span");
+    t.className = "what";
+    t.textContent = what;
+    if (href) t.href = href;
+
+    li.appendChild(w);
+    li.appendChild(t);
+    list.appendChild(li);
   }
 
-  var ev = items.map(function(li){
-    return {li: li, s: parse(li.getAttribute("data-s")), e: parse(li.getAttribute("data-e"))};
-  });
-  // ha nincs megadva a vége: a következő esemény kezdéséig tart (az utolsónál 1 óra)
-  ev.forEach(function(x, i){
-    if (isNaN(x.e)) x.e = i + 1 < ev.length ? ev[i + 1].s : x.s + 3600000;
-  });
+  // Idővonal újrarajzolása percenként, így éjfélkor is a mai nap jelenik meg
+  function render() {
+    var now = new Date();
+    list.innerHTML = "";
 
-  var focus = null;     // az az <li>, amihez görgetünk
-  var touched = false;  // görgetett/nyúlt-e már az oldalhoz a felhasználó
+    // Mai nap: ugyanúgy néz ki, mint a többi esemény
+    addItem(
+      now.toLocaleDateString("hu-HU", { timeZone: "Europe/Budapest", year: "numeric", month: "long", day: "numeric", weekday: "long" }),
+      "Ma",
+      true
+    );
 
-  // Állapotok frissítése. Igazat ad vissza, ha a fókuszált esemény megváltozott.
-  function update(){
-    var now = Date.now(), cur = null, next = null;
-    ev.forEach(function(x){
-      if (x.s <= now && now < x.e) cur = x;
-      else if (x.s > now && (!next || x.s < next.s)) next = x;
+    // Csak azok az események maradnak, amelyek még nem értek véget
+    events.filter(function (ev) { return endOf(ev.to) >= now; }).forEach(function (ev) {
+      var isCurrent = startOf(ev.from) <= now && now <= endOf(ev.to);
+      addItem(ev.when, ev.what, isCurrent, ev.wedding ? "#eskuvo" : null);
     });
-    ev.forEach(function(x){
-      var isCur = x === cur;
-      x.li.classList.toggle("current", isCur);
-      x.li.classList.toggle("next", !cur && x === next);
-      x.li.classList.toggle("past", !isCur && x.e <= now);
-    });
-    Array.prototype.forEach.call(document.querySelectorAll(".day"), function(day){
-      day.classList.toggle("over", !day.querySelector("li:not(.past)"));
-    });
-    // fókusz: épp zajló → következő → (minden véget ért) az utolsó → (még nem kezdődött) semmi
-    var last = ev[ev.length - 1];
-    var f = cur || next || (now >= last.e ? last : null);
-    var el = f ? f.li : null;
-    var changed = el !== focus;
-    focus = el;
-    return changed;
   }
 
-  function go(smooth){
-    if (focus) focus.scrollIntoView({block: "start", behavior: smooth && !reduce ? "smooth" : "auto"});
-    else window.scrollTo(0, 0);
+  // Esküvőszervezés oldal csak hash-re látszik (a timeline linkjéről)
+  function route() {
+    var showWedding = location.hash === "#eskuvo";
+    wedding.hidden = !showWedding;
+    home.hidden = showWedding;
+    window.scrollTo(0, 0);
   }
 
-  // "↑ Most" / "↓ Most" gomb, ha a mostani esemény kicsúszott a képből
-  var raf = 0;
-  function sync(){
-    raf = 0;
-    if (!focus){ jump.classList.remove("show"); return; }
-    var r = focus.getBoundingClientRect();
-    var visible = r.bottom > 0 && r.top < window.innerHeight;
-    jump.classList.toggle("show", !visible);
-    if (!visible) jump.textContent = r.bottom <= 0 ? "↑ Most" : "↓ Most";
-  }
-  function queue(){ if (!raf) raf = requestAnimationFrame(sync); }
-
-  function enter(){ touched = false; update(); go(false); sync(); }
-  window.__scrollToNow = enter; // a Black_window ellenőrző hívja, amikor az oldal újra látható
-
-  ["wheel", "touchstart", "keydown", "mousedown"].forEach(function(t){
-    addEventListener(t, function(){ touched = true; }, {passive: true});
-  });
-  addEventListener("scroll", queue, {passive: true});
-  addEventListener("resize", queue);
-  jump.addEventListener("click", function(){ touched = false; go(true); });
-
-  // belépéskor / visszatéréskor (alkalmazásváltás, bfcache) mindig a mostani eseményre ugrik
-  enter();
-  function reanchor(){ if (!touched){ go(false); sync(); } } // betűtípus/kép miatti elmozdulás ellen
-  addEventListener("load", reanchor);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reanchor);
-  addEventListener("pageshow", function(e){ if (e.persisted) enter(); });
-  document.addEventListener("visibilitychange", function(){ if (!document.hidden) enter(); });
-
-  // megnyitva hagyott oldalon is léptet: ha váltott az esemény, és nem nyúltak hozzá, szépen odagörget
-  setInterval(function(){
-    if (update() && !touched) go(true);
-    sync();
-  }, 15000);
-})();
-</script>
-<script>
-(function(){
-  function checkBlackWindow(){
-    var url = new URL(window.location.href);
-    url.searchParams.set("_black_window_check", Date.now());
-    fetch(url.toString(), {cache: "no-store"})
-      .then(function(response){
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        return response.text();
-      })
-      .then(function(html){
-        var match = html.match(/var\s+Black_window\s*=\s*(true|false)\s*;/);
-        if (!match) throw new Error("Black_window setting not found");
-        var wasHidden = document.documentElement.hidden;
-        document.documentElement.hidden = match[1] === "true";
-        // amikor az oldal újra láthatóvá válik, görgessen a mostani eseményhez
-        if (wasHidden && !document.documentElement.hidden && window.__scrollToNow) window.__scrollToNow();
-      })
-      .catch(function(error){
-        console.warn("Black_window frissítése nem sikerült:", error);
-      });
-  }
-  setInterval(checkBlackWindow, 15000);
+  render();
+  route();
+  setInterval(render, 60000);
+  window.addEventListener("hashchange", route);
 })();
 </script>
 </body>
